@@ -13,4 +13,4 @@ servers:
     ip: 10.10.10.20
     box: ubuntu/xenial64
     hostname: 1-web-sap-vagrant.vm
-    ram: 1024
+    ram: 6144

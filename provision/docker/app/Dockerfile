@@ -20,9 +20,10 @@ RUN  groupadd -g 500 -r python \
   && mkdir -p /usr/src \
   && chown -R developer /usr/src \
   && apt-get update -y \
-  && apt-get install -y $PACKAGES \
+  && apt-get install -y ${PACKAGES} \
   && pip3 install pipenv \
   && pipenv install --dev --skip-lock \
   && pipenv shell --fancy \
-  && apt-get purge \
-  && rm -rf /var/lib/apt/lists/*
+  && apt-get clean \
+  && apt-get purge -y \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

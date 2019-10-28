@@ -11,7 +11,8 @@ require 'getoptlong'
 require 'yaml'
 
 environment = ENV['ENVIRONMENT']
-load "os.rb" if File.exist?("os.rb")
+path_file_os = "provision/ruby/os.rb"
+load path_file_os if File.exist?(path_file_os)
 
 if environment.nil? || environment == ''
 		environment = 'dev'
@@ -28,26 +29,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			srv.vm.box = servers["box"]
 			srv.vm.box_url = servers["url"]
 
+			srv.ssh.insert_key = false
 			srv.ssh.forward_agent = true
-      srv.ssh.insert_key = false
-      srv.ssh.paranoid = false
       srv.ssh.keys_only = false
-      srv.ssh.username = "vagrant" # change as appropriate config.ssh.password = "vagrant"
 
       # Network
       srv.vm.network :private_network, ip: servers["ip"]
-      srv.vm.network "forwarded_port", guest: 22,    guest_ip: servers["ip"], host_ip: "127.0.0.1", host: 2222,  id: "ssh", auto_correct: true
-      srv.vm.network "forwarded_port", guest: 8000,  guest_ip: servers["ip"], host_ip: "127.0.0.1", host: 8000,  id: "http"
-      srv.vm.network "forwarded_port", guest: 44300, guest_ip: servers["ip"], host_ip: "127.0.0.1", host: 44300, id: "https"
-      srv.vm.network "forwarded_port", guest: 3300,  guest_ip: servers["ip"], host_ip: "127.0.0.1", host: 3300,  id: "rfc"
-      srv.vm.network "forwarded_port", guest: 3200,  guest_ip: servers["ip"], host_ip: "127.0.0.1", host: 3200,  id: "sapgui"
-
+      srv.vm.network "forwarded_port", guest: 8000, host: 8080
+      srv.vm.network "forwarded_port", guest: 44300, host: 44300
+      srv.vm.network "forwarded_port", guest: 3300, host: 3300
+      srv.vm.network "forwarded_port", guest: 3200, host: 3200
       srv.vm.hostname = servers["hostname"]
-
       srv.vm.synced_folder "./","/home/vagrant/sap-vagrant", {:mount_options => ['dmode=777','fmode=777']}
 
       # Check for updates only on `vagrant box outdated`
-      srv.vm.box_check_update = false
+      srv.vm.box_check_update = true
 
       # stopsap may take time
       srv.vm.graceful_halt_timeout = 600
